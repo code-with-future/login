@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login and Register</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #a2c2e0, #f8f9fa);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 450px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transform: translateY(-10px);
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      }
+
+      .container:hover {
+        transform: translateY(0);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      .form-container {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-toggle {
+        display: flex;
+        background: #007bff;
+        color: white;
+        border-bottom: 1px solid #0056b3;
+      }
+
+      .form-toggle button {
+        flex: 1;
+        padding: 15px;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        background: #0056b3;
+        color: #ffffff;
+        transition: background 0.3s ease, color 0.3s ease;
+      }
+
+      .form-toggle button.active {
+        background: #003d7a;
+        color: #ffffff;
+      }
+
+      .form-toggle button:hover {
+        background: #003d7a;
+        color: #ffffff;
+      }
+
+      .form {
+        padding: 30px;
+        background: #f9f9f9;
+        opacity: 0;
+        animation: fadeIn 0.5s forwards;
+      }
+
+      .form h2 {
+        margin-bottom: 20px;
+        font-size: 28px;
+        color: #333;
+        text-align: center;
+        font-weight: 600;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .form label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #555;
+      }
+
+      .form input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        outline: none;
+        transition: border 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .form input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+      }
+
+      .form button {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        background: #007bff;
+        color: #ffffff;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.3s ease;
+      }
+
+      .form button:hover {
+        background: #0056b3;
+        transform: translateY(-2px);
+      }
+
+      .form button:active {
+        transform: translateY(0);
+      }
+
+      .toggle-message {
+        text-align: center;
+        margin-top: 15px;
+        color: #555;
+      }
+
+      .toggle-message a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .toggle-message a:hover {
+        text-decoration: underline;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes slideOut {
+        from {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(20px);
+        }
+      }
+
+      .form-enter {
+        animation: slideIn 0.3s ease-in-out;
+      }
+
+      .form-leave {
+        animation: slideOut 0.3s ease-in-out;
+      }
+
+      @media (max-width: 600px) {
+        .form-toggle button {
+          font-size: 16px;
+          padding: 12px;
+        }
+
+        .form h2 {
+          font-size: 24px;
+        }
+
+        .form input {
+          padding: 10px;
+        }
+
+        .form button {
+          padding: 12px;
+          font-size: 16px;
+        }
+      }
+
+      /* Toast Styles */
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #28a745;
+        color: #ffffff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+      }
+
+      .toast.show {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="form-container">
+        <div class="form-toggle">
+          <button id="login-btn" class="active">Login</button>
+          <button id="register-btn">Register</button>
+        </div>
+        <form id="login-form" class="form form-enter">
+          <h2>Login</h2>
+          <label for="login-email">Email</label>
+          <input
+            type="email"
+            id="login-email"
+            placeholder="Enter your email"
+            required
+          />
+          <label for="login-password">Password</label>
+          <input
+            type="password"
+            id="login-password"
+            placeholder="Enter your password"
+            required
+          />
+          <button type="submit">Login</button>
+          <p class="toggle-message">
+            Don't have an account?
+            <a href="#" id="switch-to-register">Register here</a>
+          </p>
+        </form>
+        <form id="register-form" class="form hidden">
+          <h2>Register</h2>
+          <label for="register-name">Name</label>
+          <input
+            type="text"
+            id="register-name"
+            placeholder="Enter your name"
+            required
+          />
+          <label for="register-email">Email</label>
+          <input
+            type="email"
+            id="register-email"
+            placeholder="Enter your email"
+            required
+          />
+          <label for="register-password">Password</label>
+          <input
+            type="password"
+            id="register-password"
+            placeholder="Enter your password"
+            required
+          />
+          <button type="submit">Register</button>
+          <p class="toggle-message">
+            Already have an account?
+            <a href="#" id="switch-to-login">Login here</a>
+          </p>
+        </form>
+      </div>
+    </div>
+    <div id="toast" class="toast"></div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const loginBtn = document.getElementById("login-btn");
+        const registerBtn = document.getElementById("register-btn");
+        const loginForm = document.getElementById("login-form");
+        const registerForm = document.getElementById("register-form");
+        const switchToRegister = document.getElementById("switch-to-register");
+        const switchToLogin = document.getElementById("switch-to-login");
+        const toast = document.getElementById("toast");
+
+        function showForm(formToShow, formToHide) {
+          formToHide.classList.add("form-leave");
+          formToHide.classList.remove("form-enter");
+          formToShow.classList.add("form-enter");
+          formToShow.classList.remove("form-leave");
+          formToHide.classList.add("hidden");
+
+          setTimeout(() => {
+            formToHide.classList.add("hidden");
+            formToHide.classList.remove("form-leave");
+            formToShow.classList.remove("form-enter");
+          }, 300);
+        }
+
+        loginBtn.addEventListener("click", function () {
+          loginBtn.classList.add("active");
+          registerBtn.classList.remove("active");
+          showForm(loginForm, registerForm);
+        });
+
+        registerBtn.addEventListener("click", function () {
+          registerBtn.classList.add("active");
+          loginBtn.classList.remove("active");
+          showForm(registerForm, loginForm);
+        });
+
+        switchToRegister.addEventListener("click", function (e) {
+          e.preventDefault();
+          registerBtn.click();
+        });
+
+        switchToLogin.addEventListener("click", function (e) {
+          e.preventDefault();
+          loginBtn.click();
+        });
+
+        loginForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+          if (loginForm.checkValidity()) {
+            showToast("Login successful!");
+          }
+        });
+
+        function showToast(message) {
+          toast.textContent = message;
+          toast.classList.add("show");
+          setTimeout(() => {
+            toast.classList.remove("show");
+          }, 3000);
+        }
+      });
+    </script>
+  </body>
+</html>
